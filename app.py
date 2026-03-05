@@ -148,6 +148,13 @@ st.markdown("""
         transform: translateY(-2px);
         box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.1);
     }
+
+    /* Primary Button Force Color */
+    button[data-testid="stBaseButton-primary"] {
+        background-color: var(--primary-blue) !important;
+        color: white !important;
+        border: none !important;
+    }
     
     /* Active Query Example */
     .prompt-button {
@@ -356,12 +363,14 @@ if run_button and query.strip():
             # Sources Cards
             st.subheader("Primary Data Sources ({0})".format(len(result['sources'])))
             for i, source in enumerate(result["sources"]):
-                with st.expander("LINKED: [INTERNAL SOURCE {0}] - {1}".format(i+1, source['title'])):
-                    st.markdown(f"**Publisher:** {source['publisher'].upper()}")
-                    if source['url'].startswith('http'):
-                        st.markdown(f"**Link:** [{source['url']}]({source['url']})")
+                publisher = source.get('publisher', 'Internal').upper() if source.get('publisher') else 'INTERNAL'
+                with st.expander("LINKED: [SOURCE {0}] - {1}".format(i+1, source.get('title', 'Document'))):
+                    st.markdown(f"**Publisher:** {publisher}")
+                    url = source.get('url', '#')
+                    if url and url.startswith('http'):
+                        st.markdown(f"**Link:** [{url}]({url})")
                     else:
-                        st.markdown(f"**Location:** {source['url']}")
+                        st.markdown(f"**Location:** Local Index")
 
             # Pipeline trace
             with st.expander("Pipeline trace - Initial insight (before self-correction)"):
