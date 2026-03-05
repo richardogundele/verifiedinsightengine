@@ -1,7 +1,4 @@
-"""
-app.py
-Streamlit frontend for the Verified Insight Engine.
-"""
+"""  Streamlit frontend for the Verified Insight Engine.   """
 
 import streamlit as st
 from graph import run_pipeline
@@ -146,5 +143,4 @@ elif run_button and not query.strip():
 st.divider()
 st.caption(
     "Verified Insight Engine | Built with LangChain, LangGraph, ChromaDB, Ollama | "
-    "Richard Ogundele | MSc AI (Distinction), Manchester Metropolitan University"
 )

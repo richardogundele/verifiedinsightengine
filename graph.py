@@ -1,5 +1,4 @@
-"""
-graph.py
+""" 
 LangGraph agentic pipeline with:
 - Retrieval node
 - Insight generation node
@@ -10,7 +9,7 @@ LangGraph agentic pipeline with:
 from typing import TypedDict, List, Optional
 from langchain_ollama import OllamaEmbeddings, ChatOllama
 from langchain_community.vectorstores import Chroma
-from langchain.schema import Document
+from langchain_core.documents import Document
 from langgraph.graph import StateGraph, END
 
 # --- Config ---
@@ -19,7 +18,6 @@ EMBED_MODEL = "nomic-embed-text"
 LLM_MODEL = "llama3.2"
 TOP_K = 5
 CONFIDENCE_THRESHOLD = 0.6
-
 
 # --- State Schema ---
 class InsightState(TypedDict):
@@ -41,7 +39,6 @@ def get_vectorstore():
         embedding_function=embeddings,
         collection_name="insights"
     )
-
 
 def get_llm():
     return ChatOllama(model=LLM_MODEL, temperature=0.2)
