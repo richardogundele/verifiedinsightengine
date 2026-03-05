@@ -366,8 +366,12 @@ if run_button and query.strip():
             st.markdown("<br>", unsafe_allow_html=True)
 
             # Sources Cards
-            st.subheader("Primary Data Sources ({0})".format(len(result['sources'])))
-            for i, source in enumerate(result["sources"]):
+            sources_list = result.get('sources', [])
+            if not isinstance(sources_list, list):
+                sources_list = []
+                
+            st.subheader("Primary Data Sources ({0})".format(len(sources_list)))
+            for i, source in enumerate(sources_list):
                 publisher = source.get('publisher', 'Internal').upper() if source.get('publisher') else 'INTERNAL'
                 with st.expander("LINKED: [SOURCE {0}] - {1}".format(i+1, source.get('title', 'Document'))):
                     st.markdown(f"**Publisher:** {publisher}")
@@ -386,9 +390,10 @@ if run_button and query.strip():
                 st.markdown("**Live Web Data Retrieved:**")
                 st.info(result.get("web_context", "None found."))
 
-                if result["contradictions"]:
-                    st.markdown(f"**Contradictory documents found:** {len(result['contradictions'])}")
-                    for i, doc in enumerate(result["contradictions"]):
+                contradictions_list = result.get('contradictions', [])
+                if isinstance(contradictions_list, list) and len(contradictions_list) > 0:
+                    st.markdown(f"**Contradictory documents found:** {len(contradictions_list)}")
+                    for i, doc in enumerate(contradictions_list):
                         st.markdown(f"_Contra {i+1}: {doc.page_content[:200]}..._")
 
         except Exception as e:

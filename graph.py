@@ -13,6 +13,7 @@ from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_community.tools import DuckDuckGoSearchResults
 from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
+from chromadb.config import Settings
 from langgraph.graph import StateGraph, END
 
 # --- Config ---
@@ -41,7 +42,8 @@ def get_vectorstore():
     return Chroma(
         persist_directory=CHROMA_DIR,
         embedding_function=embeddings,
-        collection_name="insights"
+        collection_name="insights",
+        client_settings=Settings(anonymized_telemetry=False)
     )
 
 def get_llm():
@@ -126,14 +128,15 @@ def attribution_node(state: InsightState) -> InsightState:
 
     supporting_context = "\n\n".join([
         f"SUPPORTING [INTERNAL SOURCE {i+1}]: {doc.metadata.get('title', 'Unknown Title')} ({doc.page_content})"
-        for i, doc in enumerate(state["retrieved_docs"])
+        for i, doc in enumerate(state.get("retrieved_docs", []))
     ])
 
-    offset = len(state["retrieved_docs"])
+    offset = len(state.get("retrieved_docs", []))
+    contradictions = state.get("contradictions", [])
     contradiction_context = "\n\n".join([
         f"CONTRADICTING [INTERNAL SOURCE {offset + i + 1}]: {doc.metadata.get('title', 'Unknown Title')} ({doc.page_content})"
-        for i, doc in enumerate(state["contradictions"])
-    ]) if state["contradictions"] else "No significant contradictions found."
+        for i, doc in enumerate(contradictions)
+    ]) if contradictions else "No significant contradictions found."
 
     prompt = f"""You are a rigorous market intelligence analyst. Your job is to produce a VERIFIED insight.
 
