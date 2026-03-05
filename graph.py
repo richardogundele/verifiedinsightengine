@@ -11,6 +11,8 @@ import os
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
+from langchain_community.tools import DuckDuckGoSearchResults
+from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
 from langgraph.graph import StateGraph, END
 
 # --- Config ---
@@ -24,6 +26,7 @@ CONFIDENCE_THRESHOLD = 0.6
 class InsightState(TypedDict):
     query: str
     retrieved_docs: List[Document]
+    web_context: str
     initial_insight: str
     contradictions: List[Document]
     final_insight: str
@@ -53,26 +56,44 @@ def retrieve_node(state: InsightState) -> InsightState:
     return {**state, "retrieved_docs": docs}
 
 
-# --- Node 2: Generate initial insight ---
+# --- Node 2: Live Web Search Enrichment ---
+def web_search_node(state: InsightState) -> InsightState:
+    print("[NODE] Querying live internet for enrichment...")
+    try:
+        wrapper = DuckDuckGoSearchAPIWrapper(max_results=3)
+        search = DuckDuckGoSearchResults(api_wrapper=wrapper)
+        # Search the live web for the exact user query
+        web_results = search.invoke(state["query"])
+    except Exception as e:
+        print(f"[WARNING] Web search failed: {e}")
+        web_results = "No live web results retrieved."
+        
+    return {**state, "web_context": web_results}
+
+
+# --- Node 3: Generate initial insight ---
 def generate_insight_node(state: InsightState) -> InsightState:
     print("[NODE] Generating initial insight...")
     llm = get_llm()
 
     context = "\n\n".join([
-        f"[source {i+1}]: {doc.metadata.get('title', 'Unknown Title')} ({doc.page_content})"
+        f"[INTERNAL SOURCE {i+1}]: {doc.metadata.get('title', 'Unknown Title')} ({doc.page_content})"
         for i, doc in enumerate(state["retrieved_docs"])
     ])
 
     prompt = f"""You are a market intelligence analyst specialising in the family and consumer sector.
 
-Using ONLY the documents provided below, answer the following query with specific, factual claims.
-For each claim you make, you MUST reference which document it comes from using [source X].
-Do not invent or assume any information not present in the documents.
+Using ONLY the documents and LIVE WEB DATA provided below, answer the following query with specific, factual claims.
+For each claim you make, you MUST reference where it comes from using [INTERNAL SOURCE X] or [WEB SOURCE].
+Do not invent or assume any information not present in the evidence.
 
 Query: {state["query"]}
 
-Documents:
+INTERNAL CORPORATE DOCUMENTS:
 {context}
+
+LIVE WEB ENRICHMENT DATA:
+[WEB SOURCE]: {state["web_context"]}
 
 Provide a clear, structured insight with inline document references:"""
 
@@ -104,13 +125,13 @@ def attribution_node(state: InsightState) -> InsightState:
     llm = get_llm()
 
     supporting_context = "\n\n".join([
-        f"SUPPORTING [source {i+1}]: {doc.metadata.get('title', 'Unknown Title')} ({doc.page_content})"
+        f"SUPPORTING [INTERNAL SOURCE {i+1}]: {doc.metadata.get('title', 'Unknown Title')} ({doc.page_content})"
         for i, doc in enumerate(state["retrieved_docs"])
     ])
 
     offset = len(state["retrieved_docs"])
     contradiction_context = "\n\n".join([
-        f"CONTRADICTING [source {offset + i + 1}]: {doc.metadata.get('title', 'Unknown Title')} ({doc.page_content})"
+        f"CONTRADICTING [INTERNAL SOURCE {offset + i + 1}]: {doc.metadata.get('title', 'Unknown Title')} ({doc.page_content})"
         for i, doc in enumerate(state["contradictions"])
     ]) if state["contradictions"] else "No significant contradictions found."
 
@@ -121,17 +142,21 @@ Original Query: {state["query"]}
 Initial Insight Generated:
 {state["initial_insight"]}
 
-Supporting Evidence:
+Internal Supporting Evidence:
 {supporting_context}
 
-Contradictory or Nuancing Evidence:
+Live Web Evidence:
+[WEB SOURCE]: {state["web_context"]}
+
+Internal Contradictory Evidence:
 {contradiction_context}
 
 Instructions:
-1. Produce a final, balanced insight that acknowledges both supporting and contradictory evidence
-2. Every claim MUST cite a specific document using [source X] matching the numbers from the evidence blocks above
-3. End with a Confidence Score between 0.0 and 1.0 based on how well-supported the insight is
-4. Format your response as:
+1. Produce a final, balanced insight that leverages both INTERNAL sources and LIVE WEB data.
+2. Acknowledge any contradictions within the data.
+3. Every claim MUST cite its exact origin using [INTERNAL SOURCE X] or [WEB SOURCE].
+4. End with a Confidence Score between 0.0 and 1.0 based on how well-supported the insight is.
+5. Format your response as:
 
 VERIFIED INSIGHT:
 [Your balanced, attributed insight here]
@@ -181,12 +206,14 @@ def build_graph():
     workflow = StateGraph(InsightState)
 
     workflow.add_node("retrieve", retrieve_node)
+    workflow.add_node("web_search", web_search_node)
     workflow.add_node("generate", generate_insight_node)
     workflow.add_node("self_correct", self_correct_node)
     workflow.add_node("attribute", attribution_node)
 
     workflow.set_entry_point("retrieve")
-    workflow.add_edge("retrieve", "generate")
+    workflow.add_edge("retrieve", "web_search")
+    workflow.add_edge("web_search", "generate")
     workflow.add_edge("generate", "self_correct")
     workflow.add_edge("self_correct", "attribute")
     workflow.add_edge("attribute", END)
@@ -201,6 +228,7 @@ def run_pipeline(query: str) -> InsightState:
     initial_state = InsightState(
         query=query,
         retrieved_docs=[],
+        web_context="",
         initial_insight="",
         contradictions=[],
         final_insight="",

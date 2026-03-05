@@ -11,34 +11,134 @@ st.set_page_config(
     layout="wide"
 )
 
+# --- Custom CSS injected for Premium Dashboard UI ---
+st.markdown("""
+<style>
+    /* Global Typography & Spacing */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif !important;
+    }
+    
+    /* Header Styling */
+    .dashboard-header {
+        text-align: center;
+        padding-bottom: 2rem;
+    }
+    .dashboard-title {
+        background: -webkit-linear-gradient(45deg, #1E3A8A, #3B82F6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+        font-size: 3rem !important;
+        margin-bottom: 0px;
+    }
+    .dashboard-subtitle {
+        color: #4B5563;
+        font-size: 1.1rem;
+        font-weight: 300;
+        margin-top: 5px;
+    }
+
+    /* Cards */
+    .premium-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border: 1px solid #E5E7EB;
+        margin-bottom: 1rem;
+    }
+    
+    .insight-text {
+        font-size: 1.15rem;
+        line-height: 1.7;
+        color: #1F2937;
+    }
+
+    /* Pipeline Visual Stepper (Sidebar) */
+    .pipeline-wrapper {
+        border-left: 2px solid #E5E7EB;
+        padding-left: 20px;
+        margin-left: 10px;
+        margin-top: 20px;
+    }
+    .pipeline-step {
+        position: relative;
+        margin-bottom: 25px;
+    }
+    .pipeline-step::before {
+        content: '';
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        background: #3B82F6;
+        border-radius: 50%;
+        left: -27px;
+        top: 5px;
+        box-shadow: 0 0 0 4px #EFF6FF;
+    }
+    .step-title { font-weight: 600; color: #111827; margin-bottom: 2px;}
+    .step-desc { font-size: 0.85rem; color: #6B7280; }
+    
+    /* Button Override */
+    .stButton>button {
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .stButton>button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # --- Header ---
-st.title("🔍 Verified Insight Engine")
-st.markdown(
-    "**Agentic RAG system with self-correcting attribution loops for family and consumer market intelligence.**"
-)
-st.markdown(
-    "_Every insight is verified against contradictory evidence and attributed to source documents. "
-    "All processing runs locally - no data leaves your machine._"
-)
+st.markdown("""
+<div class="dashboard-header">
+    <h1 class="dashboard-title">Verdict Insight Engine</h1>
+    <p class="dashboard-subtitle">Proactive Market Research Agent & Agentic RAG Pipeline</p>
+    <p style="color: #6B7280; font-size: 0.95rem;"><em>Every insight is self-corrected against contradictory evidence and rigorously attributed to primary corporate data.</em></p>
+</div>
+""", unsafe_allow_html=True)
 st.divider()
 
-# --- Sidebar ---
 with st.sidebar:
-    st.header("ℹ️ How it works")
+    st.header("⚙️ Architecture")
+    st.caption("*The LLM acts purely as a plug-in semantic processor.*")
+
+    # Visual Pipeline representation
     st.markdown("""
-    **4-stage agentic pipeline:**
+    <div class="pipeline-wrapper">
+        <div class="pipeline-step">
+            <div class="step-title">1. Ingest</div>
+            <div class="step-desc">Structured aggregation (PDFs, Web)</div>
+        </div>
+        <div class="pipeline-step" style="opacity: 0.6;">
+            <div class="step-title">2. Enrich (Planned)</div>
+            <div class="step-desc">Proactive lateral expansion</div>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-title">3. Retrieve & Search</div>
+            <div class="step-desc">Vector DB + Live Web Data</div>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-title">4. Generate & Critique</div>
+            <div class="step-desc">Self-correcting contradiction loops</div>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-title">5. Attribute</div>
+            <div class="step-desc">Rigid mapping to primary sources</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    1. **Retrieve** - semantic search across ingested documents
-    2. **Generate** - LLM produces initial insight with citations
-    3. **Self-Correct** - agent searches for contradictory evidence
-    4. **Attribute** - every claim mapped to a source document
-
-    **Confidence scoring:**
-    - 🟢 0.7+ = High confidence
-    - 🟡 0.4-0.69 = Moderate - review recommended
-    - 🔴 Below 0.4 = Flagged for human review
-
-    **Privacy:** Powered by OpenAI models.
+    st.markdown("""
+    **Verification Thresholds:**
+    - [High] 0.7+ = Statistically sound
+    - [Moderate] 0.4-0.69 = Review recommended
+    - [Low] Below 0.4 = Flagged (requires human analyst review)
     """)
 
     st.divider()
@@ -61,17 +161,18 @@ with st.sidebar:
         os.environ["OPENAI_API_KEY"] = api_key
 
     st.divider()
-    st.markdown("**Model:** gpt-4o-mini via OpenAI")
-    st.markdown("**Vector store:** ChromaDB")
+    st.markdown("**LLM Socket:** gpt-4o-mini (OpenAI API)")
+    st.markdown("**Vector Store:** ChromaDB")
+    st.markdown("**Ingestion:** Custom Web/PDF Scrapers")
     st.markdown("**Built by:** Richard Ogundele")
 
 # --- Example queries ---
-st.subheader("Try an example query")
+st.subheader("💡 Proactive Intelligence Queries")
 examples = [
-    "How has screen time among children aged 5-10 changed in recent years?",
-    "What are the key trends in family media consumption habits?",
-    "How do parents make purchasing decisions for children's products?",
-    "What role does social media play in influencing Gen Alpha behaviour?"
+    "Identify cross-category purchasing behaviours for families with children aged 3-18.",
+    "What are the psychographic personality types of children with heavy screen time?",
+    "How has parental monitoring of YouTube and TikTok changed since 2022?",
+    "What are the emerging trends in digital literacy and Trustworthy AI?"
 ]
 
 cols = st.columns(2)
@@ -83,12 +184,12 @@ for i, example in enumerate(examples):
 st.divider()
 
 # --- Query input ---
-st.subheader("Your query")
+st.subheader("Deep Segmentation Search")
 query = st.text_area(
-    label="Enter your market intelligence question:",
+    label="Enter your market intelligence question (e.g., target tracking, behavioral shifts, deep segmentation):",
     value=selected_example if selected_example else "",
     height=80,
-    placeholder="e.g. What are the key trends in children's digital media consumption?"
+    placeholder="e.g. Determine the lateral psychographic trends and social media preferences for..."
 )
 
 run_button = st.button("🚀 Run Verified Insight", type="primary", use_container_width=True)
@@ -105,37 +206,59 @@ if run_button and query.strip():
         progress_bar = st.progress(0)
         status = st.empty()
 
-        status.text("Stage 1/4: Retrieving relevant documents...")
-        progress_bar.progress(25)
+        status.text("Stage 1/5: Retrieving internal corporate documents...")
+        progress_bar.progress(20)
 
         try:
             result = run_pipeline(query)
+            
+            status.text("Stage 2/5: Querying live internet (DuckDuckGo)...")
+            progress_bar.progress(40)
+            
+            status.text("Stage 3/5: Generating initial insight...")
+            progress_bar.progress(60)
+            
+            status.text("Stage 4/5: Self-correcting against contradictions...")
+            progress_bar.progress(80)
+            
+            status.text("Stage 5/5: Attributing claims...")
             progress_bar.progress(100)
             status.empty()
 
             # --- Results ---
             st.divider()
-            st.subheader("📊 Verified Insight")
-
-            # Confidence badge
+            
             score = result["confidence_score"]
             if score >= 0.7:
-                st.success(f"✅ Confidence Score: {score:.2f} - High confidence insight")
+                badge = """<div style="background-color: #ECFDF5; color: #065F46; padding: 6px 12px; border-radius: 9999px; display: inline-block; font-weight: 600; font-size: 0.9rem; border: 1px solid #A7F3D0;">High Confidence (""" + f"{score:.2f}" + """)</div>"""
             elif score >= 0.4:
-                st.warning(f"⚠️ Confidence Score: {score:.2f} - Moderate confidence - human review recommended")
+                badge = """<div style="background-color: #FFFBEB; color: #92400E; padding: 6px 12px; border-radius: 9999px; display: inline-block; font-weight: 600; font-size: 0.9rem; border: 1px solid #FDE68A;">Moderate Confidence (""" + f"{score:.2f}" + """) - Review Advised</div>"""
             else:
-                st.error(f"🔴 Confidence Score: {score:.2f} - Low confidence - flagged for human review")
+                badge = """<div style="background-color: #FEF2F2; color: #991B1B; padding: 6px 12px; border-radius: 9999px; display: inline-block; font-weight: 600; font-size: 0.9rem; border: 1px solid #FECACA;">Low Confidence (""" + f"{score:.2f}" + """) - Flagged for Analyst Review</div>"""
+
+            # Render custom Insight Card
+            insight_html = result["final_insight"].replace("\n", "<br>")
+            
+            card_template = """
+            <div class="premium-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #E5E7EB; padding-bottom: 15px;">
+                    <h2 style="margin: 0; color: #111827;">Verified Insight</h2>
+                    {badge_placeholder}
+                </div>
+                <div class="insight-text">
+                    {insight_placeholder}
+                </div>
+            </div>
+            """
+            st.markdown(card_template.replace("{badge_placeholder}", badge).replace("{insight_placeholder}", insight_html), unsafe_allow_html=True)
 
             if result["flagged_for_review"]:
-                st.warning("⚠️ This insight has been flagged for human review due to low confidence or significant contradictions.")
+                st.warning("⚠️ **System Flag:** This insight has been flagged by the pipeline for human review due to significant internal contradictions found during Stage 4.")
 
-            # Main insight
-            st.markdown(result["final_insight"])
+            st.markdown("<br>", unsafe_allow_html=True)
 
-            st.divider()
-
-            # Sources
-            st.subheader(f"📚 Sources Used ({len(result['sources'])})")
+            # Sources Cards
+            st.subheader("Primary Data Sources ({0})".format(len(result['sources'])))
             for i, source in enumerate(result["sources"]):
                 with st.expander(f"[source {i+1}]: {source['title']}"):
                     st.markdown(f"**Publisher:** {source['publisher'].upper()}")
@@ -145,9 +268,13 @@ if run_button and query.strip():
                         st.markdown(f"**Location:** {source['url']}")
 
             # Pipeline trace
-            with st.expander("🔬 Pipeline trace - Initial insight (before self-correction)"):
+            with st.expander("Pipeline trace - Initial insight (before self-correction)"):
                 st.markdown("**Initial insight generated before contradiction check:**")
                 st.markdown(result["initial_insight"])
+                
+                st.markdown("---")
+                st.markdown("**Live Web Data Retrieved:**")
+                st.info(result.get("web_context", "None found."))
 
                 if result["contradictions"]:
                     st.markdown(f"**Contradictory documents found:** {len(result['contradictions'])}")
