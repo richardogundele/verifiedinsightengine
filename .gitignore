@@ -29,8 +29,8 @@ ENV/
 env.bak/
 venv.bak/
 
-# ChromaDB / Vector store data (generated locally, not needed in repo)
-chroma_db/
+# ChromaDB / Vector store data (include in repo for cloud deployment)
+# chroma_db/
 *.db
 *.sqlite
 
@@ -55,9 +55,8 @@ desktop.ini
 *.log
 logs/
 
-# Temporary / uploaded documents (re-ingest locally)
-docs/
-data/
+# Temporary / uploaded documents (include in repo for cloud deployment)
+# data/
 uploads/
 
 # dotenv

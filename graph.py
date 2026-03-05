@@ -190,13 +190,14 @@ REASONING: [1-2 sentences on why you gave this confidence score]"""
         if source not in sources:
             sources.append(source)
 
-    # Add Web Enrichment as a visible source if it was successful
-    if state["web_context"] and "[snippet:" in state["web_context"]:
-        sources.append({
-            "title": "Live Internet Enrichment Results",
-            "publisher": "DUCKDUCKGO",
-            "url": "https://duckduckgo.com"
-        })
+    # Add Web Enrichment as a visible source if it contains actual data
+    if state["web_context"] and len(state["web_context"]) > 50:
+        if "No live web results retrieved" not in state["web_context"]:
+            sources.append({
+                "title": "Live Internet Enrichment Results (DuckDuckGo)",
+                "publisher": "DUCKDUCKGO SEARCH",
+                "url": "https://duckduckgo.com"
+            })
 
     flagged = confidence < CONFIDENCE_THRESHOLD
 

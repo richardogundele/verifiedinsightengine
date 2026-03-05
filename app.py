@@ -15,85 +15,158 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- Custom CSS injected for Premium Dashboard UI ---
+# --- Custom CSS for Google-tier Premium Dashboard ---
 st.markdown("""
 <style>
-    /* Global Typography & Spacing */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    /* Google-inspired Typography */
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;600&display=swap');
+    
+    :root {
+        --primary-blue: #1A73E8;
+        --deep-slate: #1F2937;
+        --border-color: #E5E7EB;
+        --bg-gradient: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
+        --card-bg: #FFFFFF;
+        --accent-emerald: #10B981;
+    }
+
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif !important;
+        background: var(--bg-gradient);
     }
-    
-    /* Header Styling */
+
+    /* Header & Branding */
     .dashboard-header {
-        text-align: center;
-        padding-bottom: 2rem;
+        text-align: left;
+        padding: 2rem 0;
+        border-bottom: 2px solid var(--border-color);
+        margin-bottom: 2rem;
     }
     .dashboard-title {
-        background: -webkit-linear-gradient(45deg, #1E3A8A, #3B82F6);
+        font-family: 'Outfit', sans-serif;
+        background: linear-gradient(90deg, #1E3A8A, #3B82F6, #60A5FA);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-weight: 800;
-        font-size: 3rem !important;
+        font-size: 3.2rem !important;
         margin-bottom: 0px;
+        letter-spacing: -0.02em;
     }
     .dashboard-subtitle {
         color: #4B5563;
-        font-size: 1.1rem;
+        font-size: 1.25rem;
         font-weight: 300;
-        margin-top: 5px;
+        margin-top: 8px;
     }
 
-    /* Cards */
+    /* Command Center (Input) */
+    .stTextArea textarea {
+        border-radius: 16px !important;
+        border: 1px solid #D1D5DB !important;
+        padding: 20px !important;
+        font-size: 1.1rem !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease;
+    }
+    .stTextArea textarea:focus {
+        border-color: var(--primary-blue) !important;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
+    }
+
+    /* Premium Cards (Result) */
     .premium-card {
-        background-color: #ffffff;
-        border-radius: 12px;
-        padding: 24px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        border: 1px solid #E5E7EB;
-        margin-bottom: 1rem;
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 32px;
+        border: 1px solid rgba(229, 231, 235, 0.8);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+        margin-bottom: 2rem;
     }
     
     .insight-text {
-        font-size: 1.15rem;
-        line-height: 1.7;
-        color: #1F2937;
+        font-size: 1.2rem;
+        line-height: 1.8;
+        color: #374151;
+        font-weight: 400;
     }
 
-    /* Pipeline Visual Stepper (Sidebar) */
+    /* Badge Styling */
+    .confidence-badge {
+        padding: 8px 16px;
+        border-radius: 99px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Sidebar Refinements */
+    section[data-testid="stSidebar"] {
+        background-color: #FFFFFF !important;
+        border-right: 1px solid var(--border-color);
+    }
+    
     .pipeline-wrapper {
-        border-left: 2px solid #E5E7EB;
-        padding-left: 20px;
-        margin-left: 10px;
-        margin-top: 20px;
+        padding-left: 15px;
+        margin-top: 30px;
     }
     .pipeline-step {
         position: relative;
-        margin-bottom: 25px;
+        padding-bottom: 25px;
+        padding-left: 25px;
+        border-left: 2px solid #E5E7EB;
     }
     .pipeline-step::before {
         content: '';
         position: absolute;
-        width: 12px;
-        height: 12px;
-        background: #3B82F6;
+        width: 14px;
+        height: 14px;
+        background: #FFFFFF;
+        border: 3px solid var(--primary-blue);
         border-radius: 50%;
-        left: -27px;
-        top: 5px;
-        box-shadow: 0 0 0 4px #EFF6FF;
+        left: -9px;
+        top: 0;
     }
-    .step-title { font-weight: 600; color: #111827; margin-bottom: 2px;}
-    .step-desc { font-size: 0.85rem; color: #6B7280; }
+    .step-title { font-weight: 600; color: #111827; font-size: 0.95rem; margin-bottom: 2px;}
+    .step-desc { font-size: 0.8rem; color: #6B7280; line-height: 1.4; }
     
-    /* Button Override */
+    /* Buttons */
     .stButton>button {
-        border-radius: 8px;
+        border-radius: 12px;
         font-weight: 600;
-        transition: all 0.2s ease;
+        padding: 0.6rem 1.5rem;
+        border: 1px solid #E5E7EB;
+        background: white;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .stButton>button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+        border-color: var(--primary-blue);
+        color: var(--primary-blue);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Active Query Example */
+    .prompt-button {
+        border: 1px solid #E5E7EB !important;
+        text-align: left !important;
+        height: auto !important;
+        padding: 15px !important;
+        background: #F9FAFB !important;
+        border-radius: 12px !important;
+        font-size: 0.9rem !important;
+        color: #374151 !important;
+    }
+
+    /* Expander Styling */
+    .streamlit-expanderHeader {
+        background-color: transparent !important;
+        border: none !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -101,9 +174,18 @@ st.markdown("""
 # --- Header ---
 st.markdown("""
 <div class="dashboard-header">
-    <h1 class="dashboard-title">Verdict Insight Engine</h1>
-    <p class="dashboard-subtitle">Proactive Market Research Agent & Agentic RAG Pipeline</p>
-    <p style="color: #6B7280; font-size: 0.95rem;"><em>Every insight is self-corrected against contradictory evidence and rigorously attributed to primary corporate data.</em></p>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div style="background: #1A73E8; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </div>
+        <div>
+            <h1 class="dashboard-title">Verdict Insight Engine</h1>
+            <p class="dashboard-subtitle">Senior Market Research Intelligence Dashboard</p>
+        </div>
+    </div>
+    <p style="color: #64748B; font-size: 1rem; margin-top: 20px; max-width: 800px; line-height: 1.6;">
+        Every claim within this dashboard is autonomously cross-referenced against contradictory evidence and rigorously attributed to primary corporate data. Hallucination-resistant by design.
+    </p>
 </div>
 """, unsafe_allow_html=True)
 st.divider()
@@ -159,24 +241,11 @@ with st.sidebar:
     
     # Check for existing system key
     system_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
-    
-    # Secure API Key input
-    api_key_input = st.text_input(
-        "OpenAI API Key (Override)", 
-        type="password", 
-        placeholder="sk-..." if not system_key else "System key active (Click to override)", 
-        help="Paste your own OpenAI key here to override the system key. Use this if you have your own credits."
-    )
-    
-    # Final API key to use
-    api_key = api_key_input if api_key_input else system_key
+    api_key = system_key
         
     if api_key:
         os.environ["OPENAI_API_KEY"] = api_key
-        if api_key_input:
-            st.success("Using provided User API Key", icon="👤")
-        elif system_key:
-            st.info("Using Shared System API Key", icon="🌐")
+        st.info("Verified Access Active: Shared System API Key", icon="🌐")
     else:
         st.warning("No API Key found. Results will not be generated.", icon="⚠️")
 
@@ -248,32 +317,36 @@ if run_button and query.strip():
             # --- Results ---
             st.divider()
             
+            # Dynamic Confidence Badge
             score = result["confidence_score"]
             if score >= 0.7:
-                badge = """<div style="background-color: #ECFDF5; color: #065F46; padding: 6px 12px; border-radius: 9999px; display: inline-block; font-weight: 600; font-size: 0.9rem; border: 1px solid #A7F3D0;">High Confidence (""" + f"{score:.2f}" + """)</div>"""
+                badge = f"""<div class="confidence-badge" style="background: #ECFDF5; color: #064E3B; border: 1px solid #A7F3D0;">🛡️ High Confidence ({score:.2f})</div>"""
             elif score >= 0.4:
-                badge = """<div style="background-color: #FFFBEB; color: #92400E; padding: 6px 12px; border-radius: 9999px; display: inline-block; font-weight: 600; font-size: 0.9rem; border: 1px solid #FDE68A;">Moderate Confidence (""" + f"{score:.2f}" + """) - Review Advised</div>"""
+                badge = f"""<div class="confidence-badge" style="background: #FFFBEB; color: #78350F; border: 1px solid #FDE68A;">⚖️ Moderate Confidence ({score:.2f})</div>"""
             else:
-                badge = """<div style="background-color: #FEF2F2; color: #991B1B; padding: 6px 12px; border-radius: 9999px; display: inline-block; font-weight: 600; font-size: 0.9rem; border: 1px solid #FECACA;">Low Confidence (""" + f"{score:.2f}" + """) - Flagged for Analyst Review</div>"""
+                badge = f"""<div class="confidence-badge" style="background: #FEF2F2; color: #7F1D1D; border: 1px solid #FECACA;">⚠️ Low Confidence ({score:.2f})</div>"""
 
             # Render custom Insight Card
             insight_html = result["final_insight"].replace("\n", "<br>")
             
-            card_template = """
+            card_template = f"""
             <div class="premium-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #E5E7EB; padding-bottom: 15px;">
-                    <h2 style="margin: 0; color: #111827;">Verified Insight</h2>
-                    {badge_placeholder}
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
+                    <div>
+                        <h2 style="margin: 0; color: #111827; font-family: 'Outfit'; font-size: 1.75rem;">Verified Intelligence Output</h2>
+                        <p style="color: #6B7280; font-size: 0.9rem; margin-top: 4px;">Self-corrected via lateral web expansion & primary document audit.</p>
+                    </div>
+                    {badge}
                 </div>
                 <div class="insight-text">
-                    {insight_placeholder}
+                    {insight_html}
                 </div>
-                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #E5E7EB; color: #6B7280; font-size: 0.85rem; font-style: italic;">
-                    *Transparency Note: Every claim above is cited to a specific internal document or live web source. Use the "Primary Data Sources" section below to audit the full source metadata.*
+                <div style="margin-top: 30px; padding: 20px; background: #F8FAFC; border-radius: 12px; border: 1px dashed #E2E8F0; color: #475569; font-size: 0.9rem;">
+                    <strong>🔍 Traceability Audit:</strong> Every claim documented in this insight is cross-referenced using the primary data sources indexed below. Contradictory evidence has been weighted and neutralized via the agentic critique loop.
                 </div>
             </div>
             """
-            st.markdown(card_template.replace("{badge_placeholder}", badge).replace("{insight_placeholder}", insight_html), unsafe_allow_html=True)
+            st.markdown(card_template, unsafe_allow_html=True)
 
             if result["flagged_for_review"]:
                 st.warning("⚠️ **System Flag:** This insight has been flagged by the pipeline for human review due to significant internal contradictions found during Stage 4.")
@@ -316,7 +389,10 @@ elif run_button and not query.strip():
     st.warning("Please enter a query before running.")
 
 # --- Footer ---
-st.divider()
-st.caption(
-    "Verified Insight Engine | Built with LangChain, LangGraph, ChromaDB, OpenAI | "
-)
+st.markdown("""
+<div style="text-align: center; padding: 40px 0; color: #94A3B8; font-size: 0.9rem; border-top: 1px solid #E2E8F0; margin-top: 60px;">
+    <strong>Verified Insight Engine</strong> | Powered by LangGraph, ChromaDB, and OpenAI <b>gpt-4o-mini</b><br>
+    Built for high-stakes consumer market intelligence.
+    <div style="margin-top: 10px; opacity: 0.6;">© 2024 Verified Insight | Richard Ogundele</div>
+</div>
+""", unsafe_allow_html=True)
