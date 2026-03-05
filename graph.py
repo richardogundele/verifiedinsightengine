@@ -185,10 +185,18 @@ REASONING: [1-2 sentences on why you gave this confidence score]"""
         source = {
             "title": doc.metadata.get("title", "Unknown Title"),
             "publisher": doc.metadata.get("source", "Unknown"),
-            "url": doc.page_content
+            "url": doc.metadata.get("url", doc.page_content)
         }
         if source not in sources:
             sources.append(source)
+
+    # Add Web Enrichment as a visible source if it was successful
+    if state["web_context"] and "[snippet:" in state["web_context"]:
+        sources.append({
+            "title": "Live Internet Enrichment Results",
+            "publisher": "DUCKDUCKGO",
+            "url": "https://duckduckgo.com"
+        })
 
     flagged = confidence < CONFIDENCE_THRESHOLD
 

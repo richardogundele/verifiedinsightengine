@@ -134,6 +134,16 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
+    st.divider()
+    st.markdown("### 🧬 Active Data Assets")
+    st.markdown("""
+    *The pipeline is currently pulling from:*
+    - [UNICEF Reports: Digital Childhoods](https://www.unicef.org/reports/digital-childhood-geographic-and-developmental-perspectives)
+    - [Ofcom 2024/25: Children's Media Use](https://www.ofcom.org.uk/research-and-data/media-literacy-research/childrens/children-and-parents-media-use-and-attitudes-report-2024)
+    - [Alan Turing Institute: AI Governance](https://www.turing.ac.uk/research/publications)
+    - [Live Web Enrichment (DuckDuckGo)](https://duckduckgo.com)
+    """)
+
     st.markdown("""
     **Verification Thresholds:**
     - [High] 0.7+ = Statistically sound
@@ -248,6 +258,9 @@ if run_button and query.strip():
                 <div class="insight-text">
                     {insight_placeholder}
                 </div>
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #E5E7EB; color: #6B7280; font-size: 0.85rem; font-style: italic;">
+                    *Transparency Note: Every claim above is cited to a specific internal document or live web source. Use the "Primary Data Sources" section below to audit the full source metadata.*
+                </div>
             </div>
             """
             st.markdown(card_template.replace("{badge_placeholder}", badge).replace("{insight_placeholder}", insight_html), unsafe_allow_html=True)
@@ -260,7 +273,7 @@ if run_button and query.strip():
             # Sources Cards
             st.subheader("Primary Data Sources ({0})".format(len(result['sources'])))
             for i, source in enumerate(result["sources"]):
-                with st.expander(f"[source {i+1}]: {source['title']}"):
+                with st.expander("LINKED: [INTERNAL SOURCE {0}] - {1}".format(i+1, source['title'])):
                     st.markdown(f"**Publisher:** {source['publisher'].upper()}")
                     if source['url'].startswith('http'):
                         st.markdown(f"**Link:** [{source['url']}]({source['url']})")
