@@ -78,10 +78,16 @@ ollama pull nomic-embed-text
 # 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Ingest documents
+# 3. Configure API Key (Optional for Shared Access)
+# Create a .env file from the example
+cp .env.example .env
+# Edit .env and add your OPENAI_API_KEY
+# If this is set, users will not need to enter their own key in the UI.
+
+# 4. Ingest documents
 python ingest.py
 
-# 4. Run the app
+# 5. Run the app
 streamlit run app.py
 ```
 

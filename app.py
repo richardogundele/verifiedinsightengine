@@ -2,7 +2,11 @@
 
 import os
 import streamlit as st
+from dotenv import load_dotenv
 from graph import run_pipeline
+
+# Load environment variables (from .env if it exists)
+load_dotenv()
 
 # --- Page config ---
 st.set_page_config(
@@ -153,22 +157,28 @@ with st.sidebar:
 
     st.divider()
     
+    # Check for existing system key
+    system_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
+    
     # Secure API Key input
     api_key_input = st.text_input(
-        "OpenAI API Key (Required for app to run)", 
+        "OpenAI API Key (Override)", 
         type="password", 
-        placeholder="sk-...", 
-        help="You can also set this in Streamlit Community Cloud Secrets."
+        placeholder="sk-..." if not system_key else "System key active (Click to override)", 
+        help="Paste your own OpenAI key here to override the system key. Use this if you have your own credits."
     )
     
-    # Use key from Streamlit secrets if available, otherwise from input
-    try:
-        api_key = st.secrets.get("OPENAI_API_KEY", api_key_input)
-    except Exception:
-        api_key = api_key_input
+    # Final API key to use
+    api_key = api_key_input if api_key_input else system_key
         
     if api_key:
         os.environ["OPENAI_API_KEY"] = api_key
+        if api_key_input:
+            st.success("Using provided User API Key", icon="👤")
+        elif system_key:
+            st.info("Using Shared System API Key", icon="🌐")
+    else:
+        st.warning("No API Key found. Results will not be generated.", icon="⚠️")
 
     st.divider()
     st.markdown("**LLM Socket:** gpt-4o-mini (OpenAI API)")
