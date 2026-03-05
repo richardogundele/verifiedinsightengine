@@ -8,12 +8,12 @@ sys.path.insert(0, ".")
 
 from data.datascrap import DataScrap
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_ollama import OllamaEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 
 # --- Config ---
 CHROMA_DIR = "./chroma_db"
-EMBED_MODEL = "nomic-embed-text"
+EMBED_MODEL = "text-embedding-3-small"
 CHUNK_SIZE = 800
 CHUNK_OVERLAP = 100
 
@@ -111,10 +111,14 @@ def split_documents(docs):
 
 def embed_and_store(chunks):
     """Embed chunks and store in ChromaDB."""
-    print(f"\n[INFO] Embedding with Ollama model: {EMBED_MODEL}")
+    print(f"\n[INFO] Embedding with OpenAI model: {EMBED_MODEL}")
     print("[INFO] This may take a few minutes on first run...\n")
 
-    embeddings = OllamaEmbeddings(model=EMBED_MODEL)
+    if "OPENAI_API_KEY" not in os.environ:
+        api_key = input("Enter your OpenAI API key: ").strip()
+        os.environ["OPENAI_API_KEY"] = api_key
+
+    embeddings = OpenAIEmbeddings(model=EMBED_MODEL)
 
     vectorstore = Chroma.from_documents(
         documents=chunks,

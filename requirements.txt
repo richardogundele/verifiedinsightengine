@@ -1,6 +1,6 @@
 langchain==0.3.14
 langchain-community==0.3.14
-langchain-ollama==0.2.3
+langchain-openai
 langgraph==0.2.69
 chromadb==0.6.3
 streamlit==1.41.1

@@ -7,15 +7,16 @@ LangGraph agentic pipeline with:
 """
 
 from typing import TypedDict, List, Optional
-from langchain_ollama import OllamaEmbeddings, ChatOllama
+import os
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
 from langgraph.graph import StateGraph, END
 
 # --- Config ---
 CHROMA_DIR = "./chroma_db"
-EMBED_MODEL = "nomic-embed-text"
-LLM_MODEL = "llama3.2"
+EMBED_MODEL = "text-embedding-3-small"
+LLM_MODEL = "gpt-4o-mini"
 TOP_K = 5
 CONFIDENCE_THRESHOLD = 0.6
 
@@ -33,7 +34,7 @@ class InsightState(TypedDict):
 
 # --- Shared resources ---
 def get_vectorstore():
-    embeddings = OllamaEmbeddings(model=EMBED_MODEL)
+    embeddings = OpenAIEmbeddings(model=EMBED_MODEL)
     return Chroma(
         persist_directory=CHROMA_DIR,
         embedding_function=embeddings,
@@ -41,7 +42,7 @@ def get_vectorstore():
     )
 
 def get_llm():
-    return ChatOllama(model=LLM_MODEL, temperature=0.2)
+    return ChatOpenAI(model=LLM_MODEL, temperature=0.2)
 
 
 # --- Node 1: Retrieve relevant documents ---

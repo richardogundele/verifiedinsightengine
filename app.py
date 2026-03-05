@@ -1,5 +1,6 @@
 """  Streamlit frontend for the Verified Insight Engine.   """
 
+import os
 import streamlit as st
 from graph import run_pipeline
 
@@ -37,11 +38,30 @@ with st.sidebar:
     - 🟡 0.4-0.69 = Moderate - review recommended
     - 🔴 Below 0.4 = Flagged for human review
 
-    **Privacy:** Runs on Ollama locally. No external API calls.
+    **Privacy:** Powered by OpenAI models.
     """)
 
     st.divider()
-    st.markdown("**Model:** llama3.2 via Ollama")
+    
+    # Secure API Key input
+    api_key_input = st.text_input(
+        "OpenAI API Key (Required for app to run)", 
+        type="password", 
+        placeholder="sk-...", 
+        help="You can also set this in Streamlit Community Cloud Secrets."
+    )
+    
+    # Use key from Streamlit secrets if available, otherwise from input
+    try:
+        api_key = st.secrets.get("OPENAI_API_KEY", api_key_input)
+    except Exception:
+        api_key = api_key_input
+        
+    if api_key:
+        os.environ["OPENAI_API_KEY"] = api_key
+
+    st.divider()
+    st.markdown("**Model:** gpt-4o-mini via OpenAI")
     st.markdown("**Vector store:** ChromaDB")
     st.markdown("**Built by:** Richard Ogundele")
 
@@ -72,6 +92,10 @@ query = st.text_area(
 )
 
 run_button = st.button("🚀 Run Verified Insight", type="primary", use_container_width=True)
+
+if run_button and not os.environ.get("OPENAI_API_KEY"):
+    st.error("Please provide an OpenAI API Key in the sidebar to run the pipeline.")
+    st.stop()
 
 # --- Run pipeline ---
 if run_button and query.strip():
@@ -135,9 +159,8 @@ if run_button and query.strip():
             status.empty()
             st.error(f"Pipeline error: {str(e)}")
             st.markdown("**Troubleshooting:**")
-            st.markdown("- Make sure Ollama is running: `ollama serve`")
-            st.markdown("- Make sure you have ingested documents: `python ingest.py`")
-            st.markdown("- Make sure llama3.2 is pulled: `ollama pull llama3.2`")
+            st.markdown("- Verify your OpenAI API Key is entered correctly and has valid billing.")
+            st.markdown("- Check if you need to run `python ingest.py` to ingest documents via OpenAI models.")
 
 elif run_button and not query.strip():
     st.warning("Please enter a query before running.")
@@ -145,5 +168,5 @@ elif run_button and not query.strip():
 # --- Footer ---
 st.divider()
 st.caption(
-    "Verified Insight Engine | Built with LangChain, LangGraph, ChromaDB, Ollama | "
+    "Verified Insight Engine | Built with LangChain, LangGraph, ChromaDB, OpenAI | "
 )
