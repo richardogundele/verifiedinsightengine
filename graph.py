@@ -191,8 +191,9 @@ REASONING: [1-2 sentences on why you gave this confidence score]"""
             sources.append(source)
 
     # Add Web Enrichment as a visible source if it contains actual data
-    if state["web_context"] and len(state["web_context"]) > 50:
-        if "No live web results retrieved" not in state["web_context"]:
+    web_text = str(state.get("web_context", ""))
+    if web_text and len(web_text) > 50:
+        if "No live web results retrieved" not in web_text:
             sources.append({
                 "title": "Live Internet Enrichment Results (DuckDuckGo)",
                 "publisher": "DUCKDUCKGO SEARCH",

@@ -151,12 +151,14 @@ st.markdown("""
 
     /* Primary Button Force Color */
     button[data-testid="stBaseButton-primary"], 
-    .stButton>button[kind="primary"] {
+    .stButton>button[kind="primary"],
+    .stButton>button:first-child:not(.prompt-button) {
         background-color: var(--primary-blue) !important;
         color: white !important;
         border: none !important;
         visibility: visible !important;
         display: inline-flex !important;
+        opacity: 1 !important;
     }
     
     /* Active Query Example */
