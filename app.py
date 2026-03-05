@@ -150,10 +150,13 @@ st.markdown("""
     }
 
     /* Primary Button Force Color */
-    button[data-testid="stBaseButton-primary"] {
+    button[data-testid="stBaseButton-primary"], 
+    .stButton>button[kind="primary"] {
         background-color: var(--primary-blue) !important;
         color: white !important;
         border: none !important;
+        visibility: visible !important;
+        display: inline-flex !important;
     }
     
     /* Active Query Example */

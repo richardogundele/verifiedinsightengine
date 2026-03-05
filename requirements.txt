@@ -2,7 +2,7 @@ langchain==0.3.14
 langchain-community==0.3.14
 langchain-openai
 langgraph==0.2.69
-chromadb==0.6.3
+chromadb==0.5.3
 langchain-chroma==0.1.4
 streamlit==1.41.1
 pypdf==5.1.0
