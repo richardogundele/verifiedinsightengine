@@ -58,14 +58,14 @@ def generate_insight_node(state: InsightState) -> InsightState:
     llm = get_llm()
 
     context = "\n\n".join([
-        f"[DOC {i+1} | Source: {doc.metadata.get('source', 'Unknown')} | Page: {doc.metadata.get('page', 'N/A')}]\n{doc.page_content}"
+        f"[source {i+1}]: {doc.metadata.get('title', 'Unknown Title')} ({doc.page_content})"
         for i, doc in enumerate(state["retrieved_docs"])
     ])
 
     prompt = f"""You are a market intelligence analyst specialising in the family and consumer sector.
 
 Using ONLY the documents provided below, answer the following query with specific, factual claims.
-For each claim you make, you MUST reference which document it comes from using [DOC X].
+For each claim you make, you MUST reference which document it comes from using [source X].
 Do not invent or assume any information not present in the documents.
 
 Query: {state["query"]}
@@ -103,12 +103,13 @@ def attribution_node(state: InsightState) -> InsightState:
     llm = get_llm()
 
     supporting_context = "\n\n".join([
-        f"[SUPPORT DOC {i+1} | Source: {doc.metadata.get('source', 'Unknown')} | Page: {doc.metadata.get('page', 'N/A')}]\n{doc.page_content}"
+        f"SUPPORTING [source {i+1}]: {doc.metadata.get('title', 'Unknown Title')} ({doc.page_content})"
         for i, doc in enumerate(state["retrieved_docs"])
     ])
 
+    offset = len(state["retrieved_docs"])
     contradiction_context = "\n\n".join([
-        f"[CONTRA DOC {i+1} | Source: {doc.metadata.get('source', 'Unknown')} | Page: {doc.metadata.get('page', 'N/A')}]\n{doc.page_content}"
+        f"CONTRADICTING [source {offset + i + 1}]: {doc.metadata.get('title', 'Unknown Title')} ({doc.page_content})"
         for i, doc in enumerate(state["contradictions"])
     ]) if state["contradictions"] else "No significant contradictions found."
 
@@ -127,7 +128,7 @@ Contradictory or Nuancing Evidence:
 
 Instructions:
 1. Produce a final, balanced insight that acknowledges both supporting and contradictory evidence
-2. Every claim MUST cite a specific document using [SUPPORT DOC X] or [CONTRA DOC X]
+2. Every claim MUST cite a specific document using [source X] matching the numbers from the evidence blocks above
 3. End with a Confidence Score between 0.0 and 1.0 based on how well-supported the insight is
 4. Format your response as:
 
@@ -156,9 +157,9 @@ REASONING: [1-2 sentences on why you gave this confidence score]"""
     sources = []
     for doc in state["retrieved_docs"] + state["contradictions"]:
         source = {
-            "file": doc.metadata.get("source", "Unknown"),
-            "page": doc.metadata.get("page", "N/A"),
-            "excerpt": doc.page_content[:200] + "..."
+            "title": doc.metadata.get("title", "Unknown Title"),
+            "publisher": doc.metadata.get("source", "Unknown"),
+            "url": doc.page_content
         }
         if source not in sources:
             sources.append(source)

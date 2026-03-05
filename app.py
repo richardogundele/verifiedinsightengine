@@ -113,9 +113,12 @@ if run_button and query.strip():
             # Sources
             st.subheader(f"📚 Sources Used ({len(result['sources'])})")
             for i, source in enumerate(result["sources"]):
-                with st.expander(f"Source {i+1}: {source['file']} | Page {source['page']}"):
-                    st.markdown(f"**Excerpt:**")
-                    st.markdown(f"_{source['excerpt']}_")
+                with st.expander(f"[source {i+1}]: {source['title']}"):
+                    st.markdown(f"**Publisher:** {source['publisher'].upper()}")
+                    if source['url'].startswith('http'):
+                        st.markdown(f"**Link:** [{source['url']}]({source['url']})")
+                    else:
+                        st.markdown(f"**Location:** {source['url']}")
 
             # Pipeline trace
             with st.expander("🔬 Pipeline trace - Initial insight (before self-correction)"):
